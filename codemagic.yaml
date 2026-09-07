@@ -1,0 +1,24 @@
+workflows:
+  ios-build:
+    name: Build Unsigned IPA
+    instance_type: mac_mini_m1
+    max_build_duration: 30
+    scripts:
+      - name: Build Xcode project
+        script: |
+          xcodebuild \
+            -project "LiveContainer.xcodeproj" \
+            -scheme "LiveContainer" \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            clean build
+      - name: Package IPA
+        script: |
+          mkdir -p Payload
+          cp -r build/Release-iphoneos/LiveContainer.app Payload/
+          zip -r LiveContainer.ipa Payload
+    artifacts:
+      - "*.ipa"
